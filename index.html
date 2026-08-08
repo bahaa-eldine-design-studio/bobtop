@@ -79,24 +79,50 @@ kbd{background:#2a2f3a;border:1px solid #3a4152;border-bottom-width:2px;padding:
     <div class="seq-step"><span class="num">4</span><b>العرض</b><div class="small muted">اسم + لينك + فتح مباشر لكل جروب</div></div>
   </div>
 
-  <!-- إضافة جروب -->
+  <!-- السحب الأوتوماتيك - يخش حسابك ويجمع الجروبات -->
+  <div class="card" style="border-color:rgba(34,197,94,.3);background:linear-gradient(135deg,rgba(34,197,94,.08),rgba(34,197,94,.02))">
+    <div class="row-between">
+      <div><h2>⚡ السحب الأوتوماتيك من حسابك</h2><p class="muted small">يخش حسابك ويجمع كل جروبات التصميم مرة واحدة — بدون لصق يدوي</p></div>
+      <span class="small" style="background:#22c55e;color:#fff;padding:4px 10px;border-radius:20px;font-weight:800">أوتوماتيك</span>
+    </div>
+
+    <div style="background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:12px;margin-top:12px">
+      <div style="font-weight:900;font-size:13px;margin-bottom:8px">الطريقة (30 ثانية مرة واحدة):</div>
+      <div style="font-size:13px;line-height:1.8;color:var(--text)">
+        1. اسحب الزر الأزرق ده للمفضلة (Bookmarks Bar):<br>
+        <a id="bookmarklet" href='javascript:(function(){let a=[...document.querySelectorAll("a[href*=\"/groups/\"]")],m=new Map();a.forEach(e=>{let h=(e.getAttribute("href")||e.href||"").split("?")[0];if(h.startsWith("/"))h="https://www.facebook.com"+h;let x=h.match(/\/groups\/([^\/\?#]+)/);if(x&&!["feed","joins","create","discover","bookmarks","notifications","search"].includes(x[1])){let id=x[1];if(!m.has(id)){let n=(e.textContent||"").trim().replace(/\s+/g," ").slice(0,80);if(!n||n.length<2){let p=e.closest("div");if(p){let t=(p.innerText||"").split("\n")[0].trim();if(t.length>2)n=t.slice(0,80);} }if(!n||n.length<2)n=id;m.set(id,{id,name:n,url:"https://www.facebook.com/groups/"+id});}}});let d=[...m.values()];if(!d.length){alert("مفيش جروبات ظاهرة - اعمل سكرول لتحميل المزيد ثم دوس الزر تاني");return;}let j=JSON.stringify(d);prompt("تم سحب "+d.length+" جروب ✅ انسخ النص كله (Ctrl+C) والصقه في خانة الاستيراد تحت:",j);if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(j).then(()=>alert("تم النسخ للحافظة! الصقه الآن في BobTop")).catch(()=>{});})();' style="display:inline-flex;align-items:center;gap:8px;background:#5865f2;color:#fff;padding:10px 16px;border-radius:10px;font-weight:900;text-decoration:none;margin:8px 0;border:2px dashed #fff;cursor:grab">🔖 BobTop - اسحب الجروبات</a>
+        <span class="small muted">← اسحب هذا للمفضلة</span><br>
+        2. افتح فيسبوك وسجل دخول بالاكونت النضيف وروح لصفحة: <a href="https://www.facebook.com/groups/joins" target="_blank" style="color:#60a5fa">facebook.com/groups/joins</a> أو <a href="https://m.facebook.com/groups/?seemore" target="_blank" style="color:#60a5fa">m.facebook.com/groups/?seemore</a> (اعمل سكرول لتحميل كل الجروبات)<br>
+        3. دوس على الزر اللي سحبته للمفضلة وهو في صفحة الجروبات — هيطلعلك مربع فيه كل الجروبات منسوخة<br>
+        4. انسخها وتعال الصقها هنا ودوس <b>استيراد أوتوماتيك</b>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <input id="autoJson" class="input" placeholder="الصق هنا النص المنسوخ من الزر (JSON) وسيتم الاستيراد اوتوماتيك" style="font-family:monospace;font-size:12px;direction:ltr" />
+      <button id="btnAutoImport" class="btn btn-primary">⚡ استيراد أوتوماتيك</button>
+      <span id="autoStatus" class="small muted"></span>
+    </div>
+    <div class="hint">الأداة لا تطلب باسورد ولا تخزن حسابك — الزر يعمل داخل متصفحك فقط ويقرأ الصفحة المفتوحة. آمن 100%.</div>
+  </div>
+
+  <!-- إضافة يدوية كبديل -->
   <div class="card">
     <div class="row-between">
-      <div><h2>➕ إضافة جروب جديد</h2><p class="muted small">الصق لينك الجروب كاملاً (مثال: https://www.facebook.com/groups/xxxx)</p></div>
+      <div><h2>➕ إضافة يدوية (اختياري)</h2><p class="muted small">لو عايز تضيف جروب واحد يدوياً</p></div>
       <button id="btnImportDemo" class="btn btn-ghost btn-small">📥 تحميل 12 جروب تجريبي</button>
     </div>
     <div class="toolbar">
       <input id="inputUrl" class="input input-url" placeholder="https://www.facebook.com/groups/..." />
-      <input id="inputName" class="input" placeholder="اسم الجروب (اختياري - سيستخرج اوتوماتيك)" style="max-width:260px" />
+      <input id="inputName" class="input" placeholder="اسم الجروب (اختياري)" style="max-width:260px" />
       <button id="btnAdd" class="btn btn-primary">إضافة</button>
       <span id="addStatus" class="small muted"></span>
     </div>
     <div class="toolbar">
-      <input id="inputBulk" class="input input-url" placeholder="لصق جماعي: كل لينك في سطر (Bulk import)" />
+      <input id="inputBulk" class="input input-url" placeholder="لصق جماعي: كل لينك في سطر" />
       <button id="btnBulk" class="btn btn-secondary">إضافة جماعية</button>
       <button id="btnClearAll" class="btn btn-ghost btn-small">🗑️ مسح الكل</button>
     </div>
-    <div class="hint">💡 <b>كيف تجيب اللينك؟</b> افتح الجروب في فيسبوك وانسخ الرابط من شريط العنوان. الاسم سيستخرج من الرابط اوتوماتيك ويمكنك تعديله.</div>
   </div>
 
   <!-- العرض والاختيار -->
@@ -228,6 +254,41 @@ function addGroup(url, nameHint){
   log('إضافة: '+name+' — '+p.url);
   return true;
 }
+function autoImportJson(txt){
+  try{
+    txt=txt.trim();
+    if(!txt) return;
+    // try parse JSON array
+    let arr;
+    if(txt.startsWith('[')) arr=JSON.parse(txt);
+    else if(txt.includes('facebook.com/groups/')){
+      // fallback treat as lines of urls
+      return bulkAddFromText(txt);
+    } else throw new Error('format');
+    if(!Array.isArray(arr)) throw new Error('not array');
+    let added=0, skipped=0;
+    arr.forEach(o=>{
+      if(!o || !o.id || !o.url) return;
+      if(groups.some(g=>g.id===o.id)){ skipped++; return;}
+      let name=(o.name||'').trim()||idToName(o.id);
+      groups.push({id:o.id, name: name.slice(0,80), url:o.url});
+      added++;
+    });
+    save(); render(); upd();
+    $('#autoStatus').textContent='✓ تم استيراد '+added+' جروب'+(skipped?' ('+skipped+' موجود مسبقاً)':'');
+    setTimeout(()=>$('#autoStatus').textContent='',4000);
+    log('استيراد أوتوماتيك: '+added+' جروب');
+    if(added>0) $('#autoJson').value='';
+  }catch(e){
+    $('#autoStatus').textContent='✗ نص غير صالح - تأكد أنك نسخت كل النص من المربع';
+    setTimeout(()=>$('#autoStatus').textContent='',3000);
+  }
+}
+function bulkAddFromText(txt){
+  const lines=txt.split(/\n|,/).map(s=>s.trim()).filter(Boolean);
+  let ok=0; lines.forEach(l=>{ if(addGroup(l,'')) ok++; });
+  return ok;
+}
 $('#btnAdd').addEventListener('click',()=>{
   const url=$('#inputUrl').value.trim();
   const name=$('#inputName').value.trim();
@@ -243,6 +304,20 @@ $('#btnBulk').addEventListener('click',()=>{
   $('#inputBulk').value='';
   log('إضافة جماعية: '+ok+' / '+lines.length);
 });
+$('#btnAutoImport').addEventListener('click',()=>{
+  const txt=$('#autoJson').value.trim();
+  if(!txt){ $('#autoStatus').textContent='الصق النص أولاً'; setTimeout(()=>$('#autoStatus').textContent='',2000); return; }
+  autoImportJson(txt);
+});
+$('#autoJson').addEventListener('paste',()=>{
+  setTimeout(()=>{
+    const txt=$('#autoJson').value.trim();
+    if(txt && txt.startsWith('[') && txt.includes('"id"')){
+      autoImportJson(txt);
+    }
+  },300);
+});
+$('#autoJson').addEventListener('keydown',e=>{ if(e.key==='Enter') $('#btnAutoImport').click(); });
 $('#btnClearAll').addEventListener('click',()=>{
   if(!groups.length) return;
   if(confirm('مسح كل الجروبات ('+groups.length+')؟')){ groups=[]; sel.clear(); save(); render(); upd(); log('مسح الكل'); }
