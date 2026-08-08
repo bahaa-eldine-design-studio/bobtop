@@ -1,0 +1,11 @@
+BobTop يحتاج Node.js ليعمل كبرنامج ديسكتوب
+
+1. افتح https://nodejs.org
+2. حمل الزر الأخضر "LTS" (Recommended)
+3. ثبته Next -> Next -> Install
+4. اعد تشغيل الجهاز (او اقفل وافتح CMD)
+5. دوس دبل كليك على BobTop.bat مرة أخرى
+
+بدون Node.js يمكنك تجربة:
+- دبل كليك على BobTop-Standalone.html (يعمل بدون أي تثبيت)
+- أو Run-WebPreview.bat بعد تثبيت Node

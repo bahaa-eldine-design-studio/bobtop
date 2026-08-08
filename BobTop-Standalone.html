@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>BobTop - Standalone Demo (No Node Required)</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0f1115;--card:#181b20;--card2:#1f232a;--border:#2a2f3a;--text:#e8eaf0;--muted:#9aa0b2;--primary:#5865f2;--success:#23a559;--danger:#ed4245;--radius:14px}
+body{font-family:Segoe UI,system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+.app{max-width:1100px;margin:0 auto;padding:18px}
+.header{display:flex;justify-content:space-between;align-items:center;background:linear-gradient(135deg,#1a1d24,#222738);border:1px solid var(--border);border-radius:14px;padding:14px 18px;margin-bottom:16px}
+.logo{font-weight:900;font-size:22px}
+.subtitle{color:var(--muted);font-size:13px}
+.badge{padding:6px 12px;border-radius:20px;font-size:12px;font-weight:700;background:rgba(35,165,89,.15);color:#3dd68c;border:1px solid rgba(35,165,89,.3)}
+.main{display:flex;flex-direction:column;gap:16px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px}
+.card-header h2{font-size:16px;font-weight:800}
+.muted{color:var(--muted)} .small{font-size:12px}
+.row-between{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.btn{border:none;border-radius:10px;padding:10px 16px;font-weight:700;font-size:13px;cursor:pointer;display:inline-flex;gap:6px}
+.btn-primary{background:var(--primary);color:#fff}.btn-primary:hover{background:#4752c4}
+.btn-secondary{background:#2a2f3a;color:var(--text);border:1px solid var(--border)}
+.btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border)}
+.btn-success{background:var(--success);color:#fff}.btn-danger{background:var(--danger);color:#fff}
+.btn-large{padding:12px 20px;font-size:14px}
+.status-text{font-size:12px;color:var(--muted)}
+.groups-stats{margin-top:10px;font-size:13px;color:var(--muted);display:flex;gap:8px}
+.checkbox-all{display:flex;align-items:center;gap:8px;background:var(--card2);border:1px solid var(--border);padding:8px 12px;border-radius:10px;cursor:pointer;font-weight:700;font-size:13px}
+.checkbox-all input{width:16px;height:16px}
+.toolbar{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
+.search{flex:1;min-width:220px;background:var(--card2);border:1px solid var(--border);color:var(--text);padding:10px 12px;border-radius:10px}
+.groups-list{margin-top:12px;max-height:360px;overflow:auto;border:1px solid var(--border);border-radius:12px;background:var(--card2)}
+.empty{padding:40px 20px;text-align:center;color:var(--muted)}
+.group-item{display:flex;align-items:center;gap:12px;padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.06)}
+.group-item:hover{background:rgba(88,101,242,.07)}
+.group-item input{width:18px;height:18px;accent-color:var(--primary)}
+.group-info{flex:1;min-width:0}.group-name{font-weight:700;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.group-url{font-size:11px;color:var(--muted);direction:ltr;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:monospace}
+.monitor-card{border-color:rgba(35,165,89,.25)}
+.monitor-dot{width:12px;height:12px;border-radius:50%;background:#5a647a}
+.monitor-dot.active{background:var(--success);box-shadow:0 0 0 6px rgba(35,165,89,.2)}
+.hint{margin-top:10px;background:rgba(88,101,242,.08);border:1px solid rgba(88,101,242,.2);padding:10px 12px;border-radius:10px;font-size:12px;color:#c2c8ff}
+.activity-log{margin-top:12px;border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.log-header{padding:8px 12px;font-weight:800;font-size:12px;background:var(--card2);border-bottom:1px solid var(--border)}
+.log-items{max-height:160px;overflow:auto;padding:8px 12px;display:flex;flex-direction:column;gap:8px}
+.log-entry{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);padding:8px 10px;border-radius:10px;font-size:12px}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="header">
+<div><div class="logo">◉ BobTop <span style="background:#ffcc02;color:#111;padding:4px 10px;border-radius:20px;font-size:11px">STANDALONE</span></div><div class="subtitle">نسخة تعمل بدون Node.js - دبل كليك فقط</div></div>
+<div class="badge">جاهز ✓</div>
+</header>
+<div style="background:rgba(255,204,2,.12);border:1px solid rgba(255,204,2,.3);padding:10px 12px;border-radius:10px;font-size:12px;color:#ffd966;margin-bottom:16px">هذه نسخة تعمل بدون تثبيت Node.js. جرب اختيار الكل + الاسم + اللينك. للمراقبة الحقيقية بفيسبوك ثبت Node.js من nodejs.org ثم شغل BobTop.bat</div>
+<div class="main">
+<div class="card">
+<div class="card-header"><h2>① اسحب جروباتك</h2><p class="muted">هنا محاكاة - دوس الزر</p></div>
+<div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap"><button id="btnFetch" class="btn btn-primary btn-large">🔄 اسحب الجروبات الآن</button><button id="btnTest" class="btn btn-ghost">🔔 جرّب التنبيه</button><span id="fetchStatus" class="status-text"></span></div>
+<div id="groupsStats" style="display:none;margin-top:10px;font-size:13px;color:var(--muted)"><span id="groupsCount">0</span> <span>•</span> <span id="selectedCount">0 محدد</span></div>
+</div>
+<div class="card">
+<div class="row-between"><div><h2>② اختر جروبات التصميم</h2><p class="muted">اسم + لينك + اختيار الكل</p></div><label class="checkbox-all"><input type="checkbox" id="chkAll"><span>اختيار الكل</span></label></div>
+<div class="toolbar"><input id="search" placeholder="ابحث..." class="search"><button id="btnSave" class="btn btn-secondary">💾 حفظ</button><span id="saveStatus" class="status-text"></span></div>
+<div id="groupsList" class="groups-list"><div class="empty"><div>📦</div><div>لسه مسحبناش</div><div class="muted small">دوس اسحب الجروبات</div></div></div>
+</div>
+<div class="card monitor-card">
+<div class="row-between"><div><h2>③ المراقبة</h2><p class="muted">محاكاة اشعار ديسكتوب</p></div><div id="dot" class="monitor-dot"></div></div>
+<div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap"><button id="btnStart" class="btn btn-success btn-large" disabled>▶ ابدأ المراقبة</button><button id="btnStop" class="btn btn-danger" style="display:none">⏹ إيقاف</button><span id="mStatus" class="status-text">متوقف</span></div>
+<div class="hint">محاكاة كل 15 ثانية + اشعار متصفح</div>
+<div class="activity-log"><div class="log-header">سجل النشاط</div><div id="log" class="log-items"><div class="muted small">لا يوجد</div></div></div>
+</div>
+</div>
+</div>
+<script>
+const MOCK=[{id:'graphic.egypt.designers',name:'مصممين جرافيك - Graphic Designers Egypt',url:'https://www.facebook.com/groups/graphic.egypt.designers'},{id:'logo.egypt',name:'مصممين لوجو وشعارات - Logo Designers',url:'https://www.facebook.com/groups/logo.egypt'},{id:'freelance.egypt',name:'العمل الحر - فريلانسر مصري',url:'https://www.facebook.com/groups/freelance.egypt'},{id:'uiux.egypt',name:'UI/UX Designers Egypt',url:'https://www.facebook.com/groups/uiux.egypt'},{id:'branding.egypt',name:'Branding & Identity - هوية بصرية',url:'https://www.facebook.com/groups/branding.egypt'},{id:'social.design.eg',name:'تصميمات سوشيال ميديا',url:'https://www.facebook.com/groups/social.design.eg'},{id:'behance.egypt',name:'Behance Egypt',url:'https://www.facebook.com/groups/behance.egypt'},{id:'matloob.mosamem',name:'مطلوب مصمم - طلبات عملاء',url:'https://www.facebook.com/groups/matloob.mosamem'},{id:'photoshop.arab',name:'فوتوشوب العرب',url:'https://www.facebook.com/groups/photoshop.arab'},{id:'illustrator.egypt',name:'Adobe Illustrator Egypt',url:'https://www.facebook.com/groups/illustrator.egypt'},{id:'freelance.jobs.design',name:'وظائف فري لانس - تصميم',url:'https://www.facebook.com/groups/freelance.jobs.design'},{id:'creative.arab',name:'المبدعون العرب',url:'https://www.facebook.com/groups/creative.arab'}];
+let all=[],sel=new Set(JSON.parse(localStorage.getItem('bt_sel')||'[]')),isMon=false,timer=null;
+const $=s=>document.querySelector(s);
+function esc(s){return s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function render(){
+ const q=($('#search').value||'').toLowerCase();
+ const f=q?all.filter(g=>g.name.toLowerCase().includes(q)||g.url.includes(q)):all;
+ if(!f.length){$('#groupsList').innerHTML=all.length?`<div class="empty">لا نتائج</div>`:`<div class="empty"><div>📦</div><div>لسه مسحبناش</div></div>`;return}
+ $('#groupsList').innerHTML=f.map(g=>`<label class="group-item"><input type="checkbox" data-id="${g.id}" ${sel.has(g.id)?'checked':''}><div class="group-info"><div class="group-name">${esc(g.name)}</div><div class="group-url">${esc(g.url)}</div></div><a href="${g.url}" target="_blank" class="btn btn-ghost" style="padding:6px 10px;font-size:11px">فتح ↗</a></label>`).join('');
+ $('#groupsList').querySelectorAll('input').forEach(cb=>cb.addEventListener('change',e=>{if(e.target.checked)sel.add(e.target.dataset.id);else sel.delete(e.target.dataset.id);persist();upd();sync()}));
+}
+function persist(){localStorage.setItem('bt_sel',JSON.stringify([...sel]))}
+function upd(){$('#groupsCount').textContent=all.length+' جروب';$('#selectedCount').textContent=sel.size+' محدد';$('#groupsStats').style.display=all.length?'flex':'none';$('#btnStart').disabled=sel.size===0||isMon}
+function sync(){const q=($('#search').value||'').toLowerCase();const f=q?all.filter(g=>g.name.toLowerCase().includes(q)):all;if(!f.length){$('#chkAll').checked=false;return}$('#chkAll').checked=f.every(g=>sel.has(g.id));$('#chkAll').indeterminate=!$('#chkAll').checked&&f.some(g=>sel.has(g.id))}
+$('#chkAll').addEventListener('change',()=>{const q=($('#search').value||'').toLowerCase();const f=q?all.filter(g=>g.name.toLowerCase().includes(q)):all;if($('#chkAll').checked)f.forEach(g=>sel.add(g.id));else f.forEach(g=>sel.delete(g.id));persist();render();upd()});
+$('#search').addEventListener('input',()=>{render();sync()});
+$('#btnFetch').addEventListener('click',()=>{all=MOCK;$('#fetchStatus').textContent='✓ تم سحب '+all.length+' جروب';render();upd();sync();localStorage.setItem('bt_groups',JSON.stringify(all))});
+$('#btnTest').addEventListener('click',async()=>{if(Notification.permission!=='granted')await Notification.requestPermission();if(Notification.permission==='granted')new Notification('BobTop - منشور جديد',{body:'مطلوب مصمم لوجو بميزانية ممتازة'});addLog('تم تجربة الاشعار')});
+$('#btnSave').addEventListener('click',()=>{persist();$('#saveStatus').textContent='✓ تم حفظ '+sel.size;setTimeout(()=>$('#saveStatus').textContent='',2000);upd()});
+function setMon(v){isMon=v;$('#btnStart').style.display=v?'none':'inline-flex';$('#btnStop').style.display=v?'inline-flex':'none';$('#mStatus').textContent=v?'نشط - كل 15 ثانية':'متوقف';$('#dot').className=v?'monitor-dot active':'monitor-dot';upd()}
+function addLog(m){const at=new Date().toLocaleTimeString('ar-EG');if($('#log').querySelector('.muted'))$('#log').innerHTML='';const d=document.createElement('div');d.className='log-entry';d.innerHTML=`<div>${esc(m)}</div><div style="color:#9aa0b2;font-size:11px">${at}</div>`;$('#log').prepend(d)}
+const SAMPLE=['مطلوب هوية بصرية','مطلوب سوشيال ميديا 12 تصميم','مطلوب لوجو عقارات','مطلوب تعديل صور منتجات','مطلوب بروفايل PDF'];
+$('#btnStart').addEventListener('click',async()=>{if(Notification.permission!=='granted')await Notification.requestPermission();persist();setMon(true);addLog('بدأت المراقبة '+sel.size+' جروب');timer=setInterval(()=>{const s=all.filter(g=>sel.has(g.id));if(!s.length)return;const g=s[Math.floor(Math.random()*s.length)],t=SAMPLE[Math.floor(Math.random()*SAMPLE.length)];if(Notification.permission==='granted'){const n=new Notification('منشور جديد في '+g.name,{body:t});n.onclick=()=>open(g.url)}addLog('🔔 '+g.name+': '+t)},15000);setTimeout(()=>{const s=all.filter(g=>sel.has(g.id));if(s.length){const g=s[0];if(Notification.permission==='granted')new Notification('منشور جديد في '+g.name,{body:SAMPLE[0]});addLog('🔔 '+g.name+': '+SAMPLE[0])}},2000)});
+$('#btnStop').addEventListener('click',()=>{clearInterval(timer);setMon(false);addLog('توقفت')});
+const cached=localStorage.getItem('bt_groups');if(cached){try{all=JSON.parse(cached);render();upd();sync();$('#fetchStatus').textContent='محفوظ '+all.length+' - اسحب للتحديث'}catch{}}
+if(!all.length)upd();
+</script>
+</body>
+</html>
