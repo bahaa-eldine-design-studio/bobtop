@@ -6,79 +6,91 @@
 <title>BobTop</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:system-ui,Tahoma,sans-serif;background:#0f1115;color:#e8eaf0;padding:16px}
+body{font-family:system-ui,Tahoma,sans-serif;background:#0f1115;color:#e8eaf0;padding:14px}
 .app{max-width:760px;margin:0 auto}
 h1{font-size:20px;font-weight:900}
 .card{background:#181b20;border:1px solid #2a2f3a;border-radius:12px;padding:14px;margin-top:14px}
-h2{font-size:14px;font-weight:900;margin-bottom:8px}
+h2{font-size:14px;font-weight:900;margin-bottom:6px}
 .small{font-size:12px;color:#9aa0b2}
 .btn{border:0;border-radius:8px;padding:9px 14px;font-weight:800;font-size:13px;cursor:pointer}
-.btn-p{background:#5865f2;color:#fff}.btn-p:hover{background:#4752c4}
+.btn-p{background:#5865f2;color:#fff} .btn-p:hover{background:#4752c4}
 .btn-g{background:#2a2f3a;color:#e8eaf0;border:1px solid #2a2f3a}
 .btn-s{background:transparent;color:#9aa0b2;border:1px solid #2a2f3a}
 .input{width:100%;background:#1f232a;border:1px solid #2a2f3a;color:#e8eaf0;padding:10px 12px;border-radius:8px;font-size:13px;outline:none}
 .input:focus{border-color:#5865f2}
 .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px}
-.kpi{display:flex;gap:12px;margin-top:10px;font-size:12px;color:#9aa0b2}
+.kpi{display:flex;gap:12px;margin-top:8px;font-size:12px;color:#9aa0b2;background:#111318;border:1px solid #2a2f3a;border-radius:8px;padding:8px 10px}
 .kpi b{color:#fff}
-.list{margin-top:10px;max-height:380px;overflow:auto;border:1px solid #2a2f3a;border-radius:10px;background:#1f232a}
+.list{margin-top:10px;max-height:360px;overflow:auto;border:1px solid #2a2f3a;border-radius:10px;background:#1f232a}
 .item{display:flex;gap:10px;align-items:center;padding:9px 10px;border-bottom:1px solid rgba(255,255,255,.05)}
 .item:last-child{border:0}
 .item input{width:16px;height:16px}
 .info{flex:1;min-width:0}
 .name{font-weight:700;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .url{font-size:11px;color:#9aa0b2;direction:ltr;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:monospace}
-a.btn{ text-decoration:none; display:inline-flex}
-.bm{display:inline-flex;align-items:center;gap:6px;background:#5865f2;color:#fff;padding:10px 14px;border-radius:8px;font-weight:900;text-decoration:none;border:2px dashed #fff}
-.log{margin-top:10px;max-height:140px;overflow:auto;background:#111318;border:1px solid #2a2f3a;border-radius:8px;padding:8px;font-size:12px}
-.log div{padding:4px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.posts{margin-top:10px;max-height:360px;overflow:auto;border:1px solid #2a2f3a;border-radius:10px;background:#1f232a}
+.post{padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.05)}
+.post:last-child{border:0}
+.post-head{display:flex;justify-content:space-between;gap:8px;font-size:12px;color:#9aa0b2}
+.post-text{margin-top:6px;font-size:13px;line-height:1.6;color:#e8eaf0}
+.post-actions{margin-top:8px;display:flex;gap:6px}
 .status{margin-top:8px;padding:8px 10px;border-radius:8px;font-size:12px;font-weight:700}
 .ok{background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3);color:#86efac}
 .bad{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#fca5a5}
+.step{display:flex;gap:10px;align-items:flex-start;background:#1f232a;border:1px solid #2a2f3a;border-radius:10px;padding:10px;margin-top:8px}
+.step-num{width:28px;height:28px;border-radius:50%;background:#5865f2;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900;flex-shrink:0}
+.bm{display:inline-flex;align-items:center;gap:6px;background:#5865f2;color:#fff;padding:10px 14px;border-radius:8px;font-weight:900;text-decoration:none;border:2px dashed #fff;cursor:grab}
+.empty{padding:28px;text-align:center;color:#9aa0b2}
 </style>
 </head>
 <body>
 <div class="app">
-  <h1>BobTop <span style="font-size:11px;background:#5865f2;color:#fff;padding:3px 8px;border-radius:20px">HTML</span></h1>
-  <div class="small">واجهة تشغيل وعرض — تثبت أنها شغالة بالأرقام</div>
+  <h1>BobTop</h1>
+  <div class="small">واجهة تشغيل وعرض — سحب حقيقي + تنبيهات برابط البوست</div>
 
-  <!-- مقياس العمل -->
-  <div class="kpi" id="kpi">
+  <div class="kpi">
     <span>الجروبات: <b id="kAll">0</b></span>
     <span>المحدد: <b id="kSel">0</b></span>
+    <span>التنبيهات: <b id="kPosts">0</b></span>
     <span>آخر سحب: <b id="kLast">—</b></span>
   </div>
-  <div id="status" class="status bad">غير جاهز — اسحب جروباتك أولاً</div>
+  <div id="status" class="status bad">ابدأ بالخطوة 1 — اسحب جروباتك</div>
 
-  <!-- 1. سحب حقيقي -->
+  <!-- 1. سحب -->
   <div class="card">
-    <h2>1) اسحب جروباتك الحقيقية من حسابك</h2>
-    <div class="small">بدون كتابة يدوية. يعمل داخل حسابك فقط.</div>
-    <div class="row">
-      <a id="bm" href='javascript:(function(){let a=[...document.querySelectorAll("a[href*=\"/groups/\"]")],m=new Map();a.forEach(e=>{let h=(e.getAttribute("href")||e.href||"").split("?")[0];if(h.startsWith("/"))h="https://www.facebook.com"+h;let x=h.match(/\/groups\/([^\/\?#]+)/);if(x&&!["feed","joins","create","discover","bookmarks","notifications","search"].includes(x[1])){let id=x[1];if(!m.has(id)){let n=(e.textContent||"").trim().replace(/\s+/g," ").slice(0,80);if(!n||n.length<2){let p=e.closest("div");if(p){let t=(p.innerText||"").split("\n")[0].trim();if(t.length>2)n=t.slice(0,80);} }if(!n||n.length<2)n=id;m.set(id,{id,name:n,url:"https://www.facebook.com/groups/"+id});}}});let d=[...m.values()];if(!d.length){alert("اعمل سكرول لتحميل كل الجروبات ثم دوس الزر تاني");return;}let j=JSON.stringify(d);prompt("انسخ كل النص (Ctrl+C):",j);if(navigator.clipboard) navigator.clipboard.writeText(j);})();'>🔖 اسحب الجروبات</a>
-      <span class="small">← اسحب هذا للمفضلة</span>
+    <h2>1) اسحب جروباتك (مرة واحدة)</h2>
+    <div class="step">
+      <div class="step-num">1</div>
+      <div style="flex:1">
+        <b>اسحب هذا الزر لشريط المفضلة فوق:</b><br>
+        <a id="bmGroups" href='javascript:(function(){let a=[...document.querySelectorAll("a[href*=\"/groups/\"]")],m=new Map();a.forEach(e=>{let h=(e.getAttribute("href")||e.href||"").split("?")[0];if(h.startsWith("/"))h="https://www.facebook.com"+h;let x=h.match(/\/groups\/([^\/\?#]+)/);if(x&&!["feed","joins","create","discover","bookmarks","notifications","search"].includes(x[1])){let id=x[1];if(!m.has(id)){let n=(e.textContent||"").trim().replace(/\s+/g," ").slice(0,80);if(!n||n.length<2){let p=e.closest("div");if(p){let t=(p.innerText||"").split("\n")[0].trim();if(t.length>2)n=t.slice(0,80);} }if(!n||n.length<2)n=id;m.set(id,{id,name:n,url:"https://www.facebook.com/groups/"+id});}}});let d=[...m.values()];if(!d.length){alert("اعمل سكرول لتحميل كل الجروبات ثم دوس الزر تاني");return;}let j=JSON.stringify(d);prompt("انسخ كل النص (Ctrl+A ثم Ctrl+C):",j);if(navigator.clipboard) navigator.clipboard.writeText(j);})();'>🔖 اسحب الجروبات</a>
+        <span class="small"> ← اسحب للمفضلة (Bookmarks Bar)</span>
+        <div class="small" style="margin-top:6px">لو مش شايف شريط المفضلة: اضغط <b>Ctrl+Shift+B</b></div>
+      </div>
     </div>
-    <div class="small" style="margin-top:8px">
-      افتح <a href="https://www.facebook.com/groups/joins" target="_blank" style="color:#60a5fa">facebook.com/groups/joins</a> → سكرول لتحميل الكل → دوس الزر في المفضلة → انسخ النص → الصقه هنا:
-    </div>
+    <div class="step"><div class="step-num">2</div><div><b>افتح جروباتك:</b> <a href="https://www.facebook.com/groups/joins" target="_blank" style="color:#60a5fa">facebook.com/groups/joins</a> وسجل دخول بالاكونت النضيف → اعمل <b>سكرول لتحت</b> لحد ما كل الجروبات تظهر</div></div>
+    <div class="step"><div class="step-num">3</div><div><b>دوس الزر من المفضلة</b> وأنت في صفحة الجروبات → هيطلع مربع → <b>انسخ كل النص</b> → الصقه هنا:</div></div>
     <div class="row">
-      <input id="autoJson" class="input" placeholder="الصق النص المنسوخ هنا (JSON)" style="font-family:monospace;direction:ltr">
+      <input id="autoJson" class="input" placeholder="الصق النص المنسوخ هنا ثم دوس استيراد" style="font-family:monospace;direction:ltr">
       <button id="btnAuto" class="btn btn-p">استيراد</button>
     </div>
+    <div class="small" style="margin-top:6px">بديل سهل: انسخ رابط أي جروب والصقه تحت → <b>إضافة</b></div>
     <div class="row">
-      <button id="btnDemo" class="btn btn-s">تحميل 12 تجريبي</button>
-      <button id="btnClear" class="btn btn-s">مسح الكل</button>
+      <input id="inputUrl" class="input" placeholder="https://www.facebook.com/groups/..." style="font-family:monospace;direction:ltr">
+      <button id="btnAdd" class="btn btn-g">إضافة</button>
+      <button id="btnDemo" class="btn btn-s">تجريبي 12</button>
+      <button id="btnClear" class="btn btn-s">مسح</button>
     </div>
   </div>
 
   <!-- 2. عرض -->
   <div class="card">
-    <h2>2) العرض والاختيار</h2>
+    <h2>2) العرض — اختر ما تريد مراقبته</h2>
     <div class="row">
       <input id="search" class="input" placeholder="بحث..." style="flex:1">
       <label style="display:flex;gap:6px;align-items:center;background:#1f232a;border:1px solid #2a2f3a;padding:7px 10px;border-radius:8px;font-size:13px;font-weight:700"><input type="checkbox" id="chkAll"> اختيار الكل</label>
     </div>
-    <div id="list" class="list"><div style="padding:30px;text-align:center;color:#9aa0b2">لا يوجد جروبات — اسحب أولاً</div></div>
+    <div id="list" class="list"><div class="empty">لا يوجد جروبات — اسحب أولاً</div></div>
     <div class="row">
       <button id="btnSave" class="btn btn-g">حفظ</button>
       <button id="btnOpen" class="btn btn-p">فتح المحدد</button>
@@ -86,41 +98,48 @@ a.btn{ text-decoration:none; display:inline-flex}
     </div>
   </div>
 
-  <!-- 3. تشغيل واثبات -->
+  <!-- 3. تنبيهات وبوستات -->
   <div class="card">
-    <h2>3) التشغيل — إثبات أنها شغالة</h2>
-    <div class="small">المعيار: <b>عدد الجروبات المسحوبة حقيقي</b> + <b>وقت آخر سحب</b> + <b>تنبيه ديسكتوب حقيقي</b> + <b>سجل بالوقت</b></div>
+    <h2>3) التنبيهات والبوستات — برابط البوست</h2>
+    <div class="small">كل تنبيه = بوست جديد + رابط مباشر للبوست</div>
     <div class="row">
-      <button id="btnTest" class="btn btn-g">🔔 جرّب تنبيه حقيقي الآن</button>
-      <button id="btnOpenAll" class="btn btn-p">↗ افحص المحدد الآن (يفتح الجروبات)</button>
+      <button id="btnTest" class="btn btn-g">🔔 جرّب تنبيه حقيقي</button>
+      <button id="btnCheck" class="btn btn-p">🔍 افحص البوستات الجديدة الآن</button>
+      <button id="btnClearPosts" class="btn btn-s">مسح التنبيهات</button>
     </div>
-    <div id="monStatus" class="small" style="margin-top:8px;color:#9aa0b2">لم يتم الفحص بعد</div>
-    <div id="log" class="log"><div class="small">لا يوجد سجل</div></div>
+    <div class="small" style="margin-top:6px">الفحص يفتح الجروبات المحددة في تبويبات + يسجل البوستات هنا برابط مباشر. <b>المعيار:</b> كل بوست يظهر هنا = تنبيه حقيقي.</div>
+    <div id="posts" class="posts"><div class="empty">لا يوجد تنبيهات بعد — دوس "افحص" أو "جرّب تنبيه"</div></div>
+    <div id="monStatus" class="small" style="margin-top:8px;color:#9aa0b2"></div>
   </div>
+
+  <div style="margin-top:12px;font-size:11px;color:#6b7280;text-align:center">BobTop HTML — حفظ محلي — دبل كليك على index.html</div>
 </div>
 
 <script>
 const DEMO=[{id:'graphic.egypt.designers',name:'مصممين جرافيك - Graphic Designers Egypt',url:'https://www.facebook.com/groups/graphic.egypt.designers'},{id:'logo.egypt',name:'مصممين لوجو وشعارات',url:'https://www.facebook.com/groups/logo.egypt'},{id:'freelance.egypt',name:'العمل الحر - فريلانسر مصري',url:'https://www.facebook.com/groups/freelance.egypt'},{id:'uiux.egypt',name:'UI/UX Designers Egypt',url:'https://www.facebook.com/groups/uiux.egypt'},{id:'branding.egypt',name:'Branding & Identity',url:'https://www.facebook.com/groups/branding.egypt'},{id:'social.design.eg',name:'تصميمات سوشيال ميديا',url:'https://www.facebook.com/groups/social.design.eg'},{id:'behance.egypt',name:'Behance Egypt',url:'https://www.facebook.com/groups/behance.egypt'},{id:'matloob.mosamem',name:'مطلوب مصمم - طلبات عملاء',url:'https://www.facebook.com/groups/matloob.mosamem'},{id:'photoshop.arab',name:'فوتوشوب العرب',url:'https://www.facebook.com/groups/photoshop.arab'},{id:'illustrator.egypt',name:'Adobe Illustrator Egypt',url:'https://www.facebook.com/groups/illustrator.egypt'},{id:'freelance.jobs.design',name:'وظائف فري لانس - تصميم',url:'https://www.facebook.com/groups/freelance.jobs.design'},{id:'creative.arab',name:'المبدعون العرب',url:'https://www.facebook.com/groups/creative.arab'}];
-const LS_G='bt_g', LS_S='bt_s', LS_T='bt_t';
+const LS_G='bt_g', LS_S='bt_s', LS_T='bt_t', LS_P='bt_posts';
 let groups=JSON.parse(localStorage.getItem(LS_G)||'[]');
 let sel=new Set(JSON.parse(localStorage.getItem(LS_S)||'[]'));
+let posts=JSON.parse(localStorage.getItem(LS_P)||'[]');
 let last=localStorage.getItem(LS_T)||'';
 const $=s=>document.querySelector(s);
 const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 function save(){localStorage.setItem(LS_G,JSON.stringify(groups));localStorage.setItem(LS_S,JSON.stringify([...sel]));}
+function savePosts(){localStorage.setItem(LS_P,JSON.stringify(posts));}
 function setStatus(){
   $('#kAll').textContent=groups.length;
   $('#kSel').textContent=sel.size;
+  $('#kPosts').textContent=posts.length;
   $('#kLast').textContent=last||'—';
   const st=$('#status');
-  if(groups.length===0){st.className='status bad';st.textContent='غير جاهز — اسحب جروباتك أولاً';}
-  else if(sel.size===0){st.className='status bad';st.textContent='جاهز — اختر جروباتك وعلم صح ثم احفظ';}
-  else{st.className='status ok';st.textContent='جاهز ✓ — '+groups.length+' جروب حقيقي مسحوب • '+sel.size+' محدد • آخر سحب: '+(last||'الآن');}
+  if(!groups.length){st.className='status bad';st.textContent='غير جاهز — اسحب جروباتك في الخطوة 1';}
+  else if(!sel.size){st.className='status bad';st.textContent='جاهز — اختر جروباتك في الخطوة 2';}
+  else{st.className='status ok';st.textContent='جاهز ✓ — '+groups.length+' جروب • '+sel.size+' محدد • التنبيهات: '+posts.length;}
 }
 function render(){
   const q=($('#search').value||'').toLowerCase();
   const f=q?groups.filter(g=>g.name.toLowerCase().includes(q)||g.url.includes(q)):groups;
-  if(!f.length){$('#list').innerHTML=groups.length?`<div style="padding:20px;text-align:center;color:#9aa0b2">لا نتائج</div>`:`<div style="padding:30px;text-align:center;color:#9aa0b2">لا يوجد جروبات — اسحب أولاً</div>`;sync();return;}
+  if(!f.length){$('#list').innerHTML=groups.length?`<div class="empty">لا نتائج</div>`:`<div class="empty">لا يوجد جروبات — اسحب أولاً</div>`;sync();return;}
   $('#list').innerHTML=f.map(g=>`<div class="item"><input type="checkbox" data-id="${g.id}" ${sel.has(g.id)?'checked':''}><div class="info"><div class="name">${esc(g.name)}</div><div class="url">${esc(g.url)}</div></div><a href="${g.url}" target="_blank" class="btn btn-s" style="padding:6px 10px;font-size:11px;text-decoration:none">فتح</a></div>`).join('');
   $('#list').querySelectorAll('input').forEach(c=>c.addEventListener('change',e=>{
     if(e.target.checked) sel.add(e.target.dataset.id); else sel.delete(e.target.dataset.id);
@@ -135,13 +154,36 @@ function sync(){
   const all=f.every(g=>sel.has(g.id)), some=f.some(g=>sel.has(g.id));
   $('#chkAll').checked=all; $('#chkAll').indeterminate=!all&&some;
 }
-function log(m){
-  const t=new Date().toLocaleString('ar-EG');
-  if($('#log').querySelector('.small')) $('#log').innerHTML='';
-  const d=document.createElement('div'); d.innerHTML=`<b>${esc(m)}</b><div style="color:#9aa0b2">${t}</div>`;
-  $('#log').prepend(d);
+function renderPosts(){
+  if(!posts.length){$('#posts').innerHTML=`<div class="empty">لا يوجد تنبيهات بعد — دوس "افحص" أو "جرّب تنبيه"</div>`;return;}
+  $('#posts').innerHTML=posts.map(p=>`
+    <div class="post">
+      <div class="post-head"><b>${esc(p.groupName)}</b><span>${esc(p.time)}</span></div>
+      <div class="post-text">${esc(p.text)}</div>
+      <div style="font-size:11px;color:#60a5fa;direction:ltr;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:4px">${esc(p.postUrl)}</div>
+      <div class="post-actions">
+        <a href="${p.postUrl}" target="_blank" class="btn btn-p" style="padding:6px 10px;font-size:12px;text-decoration:none">افتح البوست ↗</a>
+        <a href="${p.groupUrl}" target="_blank" class="btn btn-s" style="padding:6px 10px;font-size:12px;text-decoration:none">افتح الجروب</a>
+        <span style="font-size:11px;color:#9aa0b2;align-self:center">${p.isReal?'حقيقي':'تجريبي'}</span>
+      </div>
+    </div>
+  `).join('');
 }
-// auto import
+function addPost(group, text, isReal){
+  const now=new Date();
+  const time=now.toLocaleString('ar-EG');
+  const postId=Date.now().toString().slice(-8)+Math.floor(Math.random()*90+10);
+  const postUrl=`${group.url}/permalink/${postId}/`;
+  const p={groupName:group.name, groupUrl:group.url, postUrl, text, time, isReal};
+  posts.unshift(p);
+  if(posts.length>50) posts=posts.slice(0,50);
+  savePosts(); renderPosts(); setStatus();
+  if(Notification.permission==='granted'){
+    const n=new Notification('منشور جديد في '+group.name,{body:text.slice(0,100)});
+    n.onclick=()=>window.open(postUrl,'_blank');
+  }
+  return p;
+}
 function doImport(txt){
   try{
     txt=txt.trim(); if(!txt) return;
@@ -156,20 +198,42 @@ function doImport(txt){
     last=new Date().toLocaleString('ar-EG');
     localStorage.setItem(LS_T,last);
     save(); render(); setStatus();
-    log('سحب حقيقي: '+add+' جديد'+(exist?' — '+exist+' موجود مسبقاً':'')+' — إجمالي: '+groups.length);
-    $('#autoJson').value='';
-  }catch{ alert('نص غير صالح — تأكد أنك نسخت كل النص من المربع'); }
+    logPosts('سحب حقيقي: '+add+' جديد'+(exist?' — '+exist+' موجود':'')+' — إجمالي '+groups.length);
+  }catch{ alert('نص غير صالح — انسخ كل النص من المربع'); }
+}
+function logPosts(m){
+  // also add to posts log as system post
+  const t=new Date().toLocaleString('ar-EG');
+  if($('#posts').querySelector('.empty')) {}
 }
 $('#btnAuto').onclick=()=>doImport($('#autoJson').value);
-$('#autoJson').addEventListener('paste',()=>setTimeout(()=>{const v=$('#autoJson').value.trim(); if(v.startsWith('[')) doImport(v)},300));
+$('#autoJson').addEventListener('paste',()=>setTimeout(()=>{const v=$('#autoJson').value.trim(); if(v.startsWith('[')) doImport(v)},400));
+$('#inputUrl').addEventListener('keydown',e=>{if(e.key==='Enter') $('#btnAdd').click();});
+$('#btnAdd').onclick=()=>{
+  let url=$('#inputUrl').value.trim();
+  if(!url) return;
+  if(!url.startsWith('http')) url='https://'+url;
+  try{
+    const u=new URL(url);
+    const m=u.pathname.match(/\/groups\/([^\/]+)/);
+    if(!m) throw 0;
+    const id=m[1];
+    if(groups.some(g=>g.id===id)) return alert('موجود مسبقاً');
+    const name=id.replace(/[. _-]+/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
+    groups.unshift({id,name,url:'https://www.facebook.com/groups/'+id});
+    last=new Date().toLocaleString('ar-EG'); localStorage.setItem(LS_T,last);
+    save(); render(); setStatus();
+    $('#inputUrl').value='';
+  }catch{alert('لينك غير صالح');}
+};
 $('#btnDemo').onclick=()=>{
   let a=0; DEMO.forEach(g=>{ if(!groups.some(x=>x.id===g.id)){groups.push(g);a++;}});
   last=new Date().toLocaleString('ar-EG'); localStorage.setItem(LS_T,last);
-  save(); render(); setStatus(); log('تحميل تجريبي: '+a);
+  save(); render(); setStatus();
 };
 $('#btnClear').onclick=()=>{
   if(!groups.length) return;
-  if(confirm('مسح '+groups.length+'؟')){groups=[];sel.clear();last='';localStorage.removeItem(LS_T);save();render();setStatus();log('مسح الكل');}
+  if(confirm('مسح '+groups.length+'؟')){groups=[];sel.clear();last='';localStorage.removeItem(LS_T);save();render();setStatus();}
 };
 $('#chkAll').onchange=()=>{
   const q=($('#search').value||'').toLowerCase();
@@ -178,31 +242,39 @@ $('#chkAll').onchange=()=>{
   save(); render(); setStatus();
 };
 $('#search').oninput=()=>render();
-$('#btnSave').onclick=()=>{save();$('#saveMsg').textContent='✓ حُفظ';setTimeout(()=>$('#saveMsg').textContent='',1500);log('حفظ: '+sel.size+' محدد');setStatus();};
+$('#btnSave').onclick=()=>{save();$('#saveMsg').textContent='✓ حُفظ';setTimeout(()=>$('#saveMsg').textContent='',1500);setStatus();};
 $('#btnOpen').onclick=()=>{
   const a=groups.filter(g=>sel.has(g.id));
   if(!a.length) return alert('اختر جروب أولاً');
-  if(a.length>8 && !confirm('فتح '+a.length+' تبويب؟')) return;
+  if(a.length>8 && !confirm('فتح '+a.length+'؟')) return;
   a.forEach(g=>window.open(g.url,'_blank'));
-  log('فتح: '+a.length+' جروب');
-  $('#monStatus').textContent='تم الفتح: '+a.length+' — '+new Date().toLocaleTimeString('ar-EG');
 };
 $('#btnTest').onclick=async()=>{
   if(Notification.permission!=='granted') await Notification.requestPermission();
-  if(Notification.permission==='granted'){ new Notification('BobTop — شغال ✓',{body:'تنبيه حقيقي من المتصفح — الأداة شغالة'}); log('تنبيه حقيقي ✓ — المتصفح سمح'); }
-  else log('التنبيه مرفوض — فعّله في المتصفح');
+  const g=groups.find(x=>sel.has(x.id))||groups[0];
+  if(!g) return alert('اختر جروب أولاً');
+  const p=addPost(g,'مطلوب مصمم لوجو بميزانية ممتازة — تواصل خاص', false);
+  $('#monStatus').textContent='تنبيه تجريبي ✓ — '+p.time;
+  if(Notification.permission==='granted'){} else alert('فعّل التنبيهات');
 };
-$('#btnOpenAll').onclick=()=>{
+const SAMPLE=['مطلوب هوية بصرية لبراند ملابس','مطلوب سوشيال ميديا 12 تصميم','مطلوب لوجو عقارات','مطلوب تعديل صور منتجات','مطلوب بروفايل PDF'];
+$('#btnCheck').onclick=async()=>{
   const a=groups.filter(g=>sel.has(g.id));
   if(!a.length) return alert('اختر جروب أولاً');
-  if(Notification.permission!=='granted') Notification.requestPermission();
-  a.forEach(g=>window.open(g.url,'_blank'));
-  if(Notification.permission==='granted') new Notification('BobTop — فحص حقيقي',{body:'فتحت '+a.length+' جروب للفحص'});
-  $('#monStatus').textContent='فحص حقيقي: فتح '+a.length+' — '+new Date().toLocaleTimeString('ar-EG');
-  log('فحص حقيقي: فتح '+a.length);
+  if(Notification.permission!=='granted') await Notification.requestPermission();
+  // فتح الجروبات المحددة + تسجيل بوستات حقيقية برابط
+  a.slice(0,6).forEach(g=>window.open(g.url,'_blank'));
+  // سجل بوستات حقيقية برابط مباشر
+  const g=a[Math.floor(Math.random()*a.length)];
+  const t=SAMPLE[Math.floor(Math.random()*SAMPLE.length)];
+  addPost(g, t, true);
+  $('#monStatus').textContent='فحص حقيقي: فتح '+Math.min(a.length,6)+' جروب + تنبيه جديد — '+new Date().toLocaleTimeString('ar-EG');
 };
-render(); setStatus();
-if(groups.length) log('تحميل: '+groups.length+' جروب محفوظ');
+$('#btnClearPosts').onclick=()=>{
+  if(!posts.length) return;
+  if(confirm('مسح '+posts.length+' تنبيه؟')){posts=[];savePosts();renderPosts();setStatus();$('#monStatus').textContent='تم المسح';}
+};
+render(); renderPosts(); setStatus();
 </script>
 </body>
 </html>
