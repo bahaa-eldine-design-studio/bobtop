@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BobTop - مراقب جروبات التصميم (Web Preview)</title>
+<link rel="stylesheet" href="style.css">
+<style>
+.web-badge { background: #ffcc02; color:#111; padding:4px 10px; border-radius:20px; font-size:11px; font-weight:800; }
+.demo-note { background: rgba(255,204,2,.12); border:1px solid rgba(255,204,2,.3); padding:10px 12px; border-radius:10px; font-size:12px; color:#ffd966; margin-top:10px; line-height:1.7; }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="header">
+    <div class="header-left">
+      <div class="logo">◉ BobTop <span class="web-badge">WEB PREVIEW</span></div>
+      <div class="subtitle">مراقب جروبات فيسبوك - نسخة المعاينة (نفس واجهة الديسكتوب)</div>
+    </div>
+    <div class="header-right">
+      <div id="loginBadge" class="badge ok">مسجل ✓ (معاينة)</div>
+      <button id="btnLogin" class="btn btn-ghost" style="display:none">تسجيل دخول</button>
+    </div>
+  </header>
+
+  <div class="demo-note">
+    ℹ️ دي نسخة معاينة ويب لنفس برنامج الديسكتوب. في الديسكتوب الحقيقي هيسحب جروباتك الحقيقية من فيسبوك. هنا بنعرض <b>12 جروب تصميم حقيقي كمثال</b> عشان تجرب ميزة <b>"اختيار الكل + اسم الجروب + اللينك"</b> اللي طلبتها.
+  </div>
+
+  <div class="main">
+    <div class="card">
+      <div class="card-header">
+        <h2>① اسحب جروباتك اوتوماتيك</h2>
+        <p class="muted">في الديسكتوب هيسحبهم من الاكونت النضيف. هنا دوس الزر عشان تشوف نفس التجربة.</p>
+      </div>
+      <div class="card-actions">
+        <button id="btnFetch" class="btn btn-primary btn-large">🔄 اسحب الجروبات الآن</button>
+        <button id="btnTestNotif" class="btn btn-ghost">🔔 جرّب التنبيه الديسكتوب</button>
+        <span id="fetchStatus" class="status-text"></span>
+      </div>
+      <div id="groupsStats" class="groups-stats" style="display:none">
+        <span id="groupsCount">0 جروب</span>
+        <span class="dot">•</span>
+        <span id="selectedCount">0 محدد</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header row-between">
+        <div>
+          <h2>② اختر جروبات التصميم اللي عايز تراقبها</h2>
+          <p class="muted">هيظهر اسم الجروب + اللينك + checkbox. تقدر تختار الكل.</p>
+        </div>
+        <label class="checkbox-all">
+          <input type="checkbox" id="chkAll">
+          <span>اختيار الكل</span>
+        </label>
+      </div>
+
+      <div class="toolbar">
+        <input id="searchGroups" type="text" placeholder="ابحث باسم الجروب..." class="search">
+        <button id="btnSaveSelection" class="btn btn-secondary">💾 حفظ الاختيار</button>
+        <span id="saveStatus" class="status-text"></span>
+      </div>
+
+      <div id="groupsList" class="groups-list">
+        <div class="empty">
+          <div class="empty-icon">📦</div>
+          <div>لسه مسحبناش الجروبات</div>
+          <div class="muted small">دوس "اسحب الجروبات الآن" عشان تشوف الليستة باختيار الكل</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card monitor-card">
+      <div class="card-header row-between">
+        <div>
+          <h2>③ المراقبة والتنبيهات</h2>
+          <p class="muted">في الديسكتوب يفضل شغال في الخلفية ويبعتلك اشعار ويندوز اول ما ينزل بوست جديد</p>
+        </div>
+        <div id="monitorDot" class="monitor-dot idle"></div>
+      </div>
+      <div class="monitor-actions">
+        <button id="btnStart" class="btn btn-success btn-large" disabled>▶ ابدأ المراقبة</button>
+        <button id="btnStop" class="btn btn-danger" style="display:none">⏹ إيقاف</button>
+        <button id="btnManualPoll" class="btn btn-ghost" disabled>🔍 افحص الآن (محاكاة)</button>
+        <span id="monitorStatus" class="status-text">متوقف</span>
+      </div>
+      <div class="hint">
+        ⏱ في النسخة الحقيقية: فحص كل 3 - 4.5 دقايق بشكل عشوائي + إشعار ديسكتوب native + ضغطة تفتح البوست<br>
+        هنا: محاكاة - هيبعتلك اشعار وهمي كل 15 ثانية عشان تجرب الاحساس
+      </div>
+      <div id="activityLog" class="activity-log">
+        <div class="log-header">سجل النشاط</div>
+        <div id="logItems" class="log-items"><div class="muted small">لا يوجد نشاط بعد</div></div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <span>BobTop v0.1.0 • Web Preview - نفس كود الديسكتوب (Electron) بس شغال على الويب للتجربة</span>
+    <span class="muted small">الديسكتوب الحقيقي: Electron + Playwright + Session Cookies - جاهز في src/main.js</span>
+  </footer>
+</div>
+
+<script>
+// Web Preview Renderer - standalone, no Electron
+const $ = s => document.querySelector(s);
+const groupsList = $('#groupsList');
+const btnFetch = $('#btnFetch');
+const fetchStatus = $('#fetchStatus');
+const groupsCountEl = $('#groupsCount');
+const selectedCountEl = $('#selectedCount');
+const groupsStats = $('#groupsStats');
+const chkAll = $('#chkAll');
+const searchInput = $('#searchGroups');
+const btnSave = $('#btnSaveSelection');
+const saveStatus = $('#saveStatus');
+const btnStart = $('#btnStart');
+const btnStop = $('#btnStop');
+const btnManualPoll = $('#btnManualPoll');
+const monitorStatus = $('#monitorStatus');
+const monitorDot = $('#monitorDot');
+const logItems = $('#logItems');
+
+let allGroups = [];
+let filteredGroups = [];
+let selectedIds = new Set(JSON.parse(localStorage.getItem('bobtop_selected')||'[]'));
+let isMonitoring = false;
+let monitorTimer = null;
+
+function escapeHtml(s){ return s.replace(/[&<>"']/g, c=> ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+function renderGroups(){
+  const q = (searchInput.value||'').trim().toLowerCase();
+  filteredGroups = q ? allGroups.filter(g=> g.name.toLowerCase().includes(q) || g.url.toLowerCase().includes(q)) : allGroups;
+  if(filteredGroups.length===0){
+    if(allGroups.length===0) groupsList.innerHTML=`<div class="empty"><div class="empty-icon">📦</div><div>لسه مسحبناش الجروبات</div><div class="muted small">دوس "اسحب الجروبات الآن"</div></div>`;
+    else groupsList.innerHTML=`<div class="empty"><div class="muted">لا يوجد نتائج لـ "${escapeHtml(q)}"</div></div>`;
+    return;
+  }
+  groupsList.innerHTML = filteredGroups.map(g=>`
+    <label class="group-item">
+      <input type="checkbox" data-id="${g.id}" ${selectedIds.has(g.id)?'checked':''}>
+      <div class="group-info">
+        <div class="group-name" title="${escapeHtml(g.name)}">${escapeHtml(g.name)}</div>
+        <div class="group-url" title="${g.url}">${escapeHtml(g.url)}</div>
+      </div>
+      <a href="${g.url}" target="_blank" class="btn btn-ghost btn-open">فتح ↗</a>
+    </label>
+  `).join('');
+  groupsList.querySelectorAll('input[type=checkbox]').forEach(cb=>{
+    cb.addEventListener('change', e=>{
+      const id=e.target.dataset.id;
+      if(e.target.checked) selectedIds.add(id); else selectedIds.delete(id);
+      persist(); updateCounts(); syncCheckAll();
+    });
+  });
+}
+function persist(){ localStorage.setItem('bobtop_selected', JSON.stringify([...selectedIds])); }
+function updateCounts(){
+  groupsCountEl.textContent=`${allGroups.length} جروب`;
+  selectedCountEl.textContent=`${selectedIds.size} محدد`;
+  groupsStats.style.display=allGroups.length?'flex':'none';
+  btnStart.disabled = selectedIds.size===0 || isMonitoring;
+  btnManualPoll.disabled = !isMonitoring;
+  btnSave.disabled = false;
+}
+function syncCheckAll(){
+  if(filteredGroups.length===0){ chkAll.checked=false; chkAll.indeterminate=false; return; }
+  const allChecked = filteredGroups.every(g=>selectedIds.has(g.id));
+  const someChecked = filteredGroups.some(g=>selectedIds.has(g.id));
+  chkAll.checked=allChecked;
+  chkAll.indeterminate=!allChecked && someChecked;
+}
+chkAll.addEventListener('change',()=>{
+  if(chkAll.checked) filteredGroups.forEach(g=>selectedIds.add(g.id));
+  else filteredGroups.forEach(g=>selectedIds.delete(g.id));
+  persist(); renderGroups(); updateCounts();
+});
+searchInput.addEventListener('input',()=>{ renderGroups(); syncCheckAll(); });
+
+btnFetch.addEventListener('click', async()=>{
+  btnFetch.disabled=true;
+  fetchStatus.textContent='جاري سحب الجروبات... (محاكاة m.facebook.com/groups/?seemore)';
+  try{
+    const r=await fetch('/api/groups/mock');
+    const data=await r.json();
+    allGroups=data.groups;
+    // keep selected that still exist
+    selectedIds = new Set([...selectedIds].filter(id=> allGroups.some(g=>g.id===id)));
+    persist();
+    fetchStatus.textContent=`✓ تم سحب ${allGroups.length} جروب - علم على اللي عايزه ودوس حفظ`;
+    renderGroups(); updateCounts(); syncCheckAll();
+  }catch(e){ fetchStatus.textContent='✗ فشل'; }
+  finally{ btnFetch.disabled=false; }
+});
+
+$('#btnTestNotif').addEventListener('click', async()=>{
+  if(Notification.permission!=='granted') await Notification.requestPermission();
+  if(Notification.permission==='granted'){
+    new Notification('BobTop - منشور جديد في مطلوب مصمم',{body:'مطلوب مصمم لوجو بميزانية ممتازة - جروب مصممين جرافيك - اضغط للفتح'});
+    addLog('🔔 تم تجربة اشعار ديسكتوب (Browser Notification)');
+  } else {
+    alert('فعل الاشعارات في المتصفح أولاً');
+  }
+});
+
+btnSave.addEventListener('click',()=>{
+  persist();
+  saveStatus.textContent=`✓ تم حفظ ${selectedIds.size} جروب للمراقبة`;
+  setTimeout(()=> saveStatus.textContent='',3000);
+  updateCounts();
+});
+
+function setMonitoringUI(mon){
+  isMonitoring=mon;
+  if(mon){
+    btnStart.style.display='none'; btnStop.style.display='inline-flex';
+    monitorStatus.textContent='نشط - يراقب (محاكاة كل 15 ثانية)';
+    monitorDot.className='monitor-dot active';
+    btnManualPoll.disabled=false;
+  } else {
+    btnStart.style.display='inline-flex'; btnStop.style.display='none';
+    monitorStatus.textContent='متوقف';
+    monitorDot.className='monitor-dot idle';
+    btnManualPoll.disabled=true;
+  }
+  updateCounts();
+}
+function addLog(msg){
+  const at=new Date().toLocaleTimeString('ar-EG');
+  if(logItems.querySelector('.muted')) logItems.innerHTML='';
+  const div=document.createElement('div');
+  div.className='log-entry';
+  div.innerHTML=`<div>${escapeHtml(msg)}</div><div class="t">${at}</div>`;
+  logItems.prepend(div);
+}
+const SAMPLE_POSTS=[
+  'مطلوب مصمم هوية بصرية لبراند ملابس - الميزانية مفتوحة',
+  'محتاج ديزاينر سوشيال ميديا لمطعم - 12 تصميم في الشهر',
+  'مطلوب لوجو احترافي لشركة عقارات - الدفع فودافون كاش',
+  'حد يعرف مصمم شاطر يعمل بروفايل شركة PDF؟',
+  'مطلوب مصمم يعدل على صور منتجات - شغل مستمر',
+];
+
+btnStart.addEventListener('click', async()=>{
+  if(Notification.permission!=='granted') await Notification.requestPermission();
+  persist();
+  setMonitoringUI(true);
+  addLog(`بدأت المراقبة لـ ${selectedIds.size} جروب - هتجيلك اشعارات وهمية للتجربة`);
+  // simulate every 15s
+  monitorTimer=setInterval(()=>{
+    const selected = allGroups.filter(g=>selectedIds.has(g.id));
+    if(selected.length===0) return;
+    const g = selected[Math.floor(Math.random()*selected.length)];
+    const txt = SAMPLE_POSTS[Math.floor(Math.random()*SAMPLE_POSTS.length)];
+    if(Notification.permission==='granted'){
+      const n=new Notification(`منشور جديد في ${g.name}`,{body: txt});
+      n.onclick=()=> window.open(g.url,'_blank');
+    }
+    addLog(`🔔 منشور جديد في ${g.name}: ${txt}`);
+  }, 15000);
+  // immediate one after 2s
+  setTimeout(()=>{
+    const selected = allGroups.filter(g=>selectedIds.has(g.id));
+    if(selected.length){
+      const g=selected[0];
+      if(Notification.permission==='granted') new Notification(`منشور جديد في ${g.name}`,{body: SAMPLE_POSTS[0]});
+      addLog(`🔔 منشور جديد في ${g.name}: ${SAMPLE_POSTS[0]}`);
+    }
+  },2000);
+});
+btnStop.addEventListener('click',()=>{
+  clearInterval(monitorTimer);
+  setMonitoringUI(false);
+  addLog('توقفت المراقبة');
+});
+btnManualPoll.addEventListener('click',()=>{
+  const selected = allGroups.filter(g=>selectedIds.has(g.id));
+  if(!selected.length) return;
+  const g=selected[Math.floor(Math.random()*selected.length)];
+  const txt=SAMPLE_POSTS[Math.floor(Math.random()*SAMPLE_POSTS.length)];
+  if(Notification.permission==='granted') new Notification(`فحص يدوي - ${g.name}`,{body: txt});
+  addLog(`🔍 فحص يدوي: ${g.name} - ${txt}`);
+  monitorStatus.textContent='تم الفحص يدوياً';
+  setTimeout(()=>{ if(isMonitoring) monitorStatus.textContent='نشط - يراقب (محاكاة كل 15 ثانية)'; },1500);
+});
+
+// init
+(async()=>{
+  // try load from localStorage mock groups if previously fetched
+  const cached=localStorage.getItem('bobtop_groups');
+  if(cached){
+    try{ allGroups=JSON.parse(cached); renderGroups(); updateCounts(); syncCheckAll(); fetchStatus.textContent=`محفوظ ${allGroups.length} جروب - اضغط اسحب للتحديث`; }catch{}
+  }
+  // auto fetch on first load for demo
+  if(allGroups.length===0){
+    // don't auto, wait for user
+  }
+  // persist groups on fetch
+  const originalFetch = btnFetch.onclick;
+  // also save to cache after fetch
+  const obs = new MutationObserver(()=>{});
+  // hook: after fetch we save
+  const origRender = renderGroups;
+})();
+
+// save groups to cache after fetch
+const _origFetchHandler = btnFetch.onclick;
+btnFetch.addEventListener('click', async()=>{ /* handled above */ });
+document.addEventListener('DOMContentLoaded', ()=>{
+  // wrap fetch to cache
+  const oldBtnFetchClick = btnFetch.onclick;
+});
+// actually cache after successful fetch via interval
+setInterval(()=>{
+  if(allGroups.length) localStorage.setItem('bobtop_groups', JSON.stringify(allGroups));
+},2000);
+
+updateCounts();
+if(selectedIds.size) setTimeout(()=>{ renderGroups(); syncCheckAll(); },100);
+</script>
+</body>
+</html>
