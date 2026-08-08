@@ -102,12 +102,24 @@ h2{font-size:14px;font-weight:900;margin-bottom:6px}
   <div class="card">
     <h2>3) التنبيهات والبوستات — برابط البوست</h2>
     <div class="small">كل تنبيه = بوست جديد + رابط مباشر للبوست</div>
+    <div class="row" style="background:#111318;border:1px solid #2a2f3a;border-radius:8px;padding:10px">
+      <div style="flex:1">
+        <b style="font-size:13px">للتسجيل الحقيقي:</b>
+        <a id="bmPost" href='javascript:(function(){let u=location.href,found="";let a=document.querySelector("a[href*=\"/permalink/\"]")||document.querySelector("a[href*=\"/posts/\"]")||[...document.querySelectorAll("a")].find(x=>x.href.includes("/groups/")&&/\/permalink\/|\/posts\//.test(x.href));if(a) found=a.href.split("?")[0];if(!found){let m=u.match(/\/permalink\/\d+\/?/);if(m) found=u.split("?")[0];}if(!found) found=u.split("?")[0];let t=(document.querySelector("[data-ad-preview=\"message\"]")||document.querySelector("div[dir=\"auto\"]")||{innerText:""}).innerText.slice(0,140).replace(/\n/g," ").trim()||prompt("انسخ نص البوست:")||"بوست جديد";let g=document.title.split(" | ")[0].split(" - ")[0].trim()||"جروب";let d={groupName:g,postUrl:found,groupUrl:u.split("/permalink")[0].split("/posts")[0].split("?")[0],text:t};let j=JSON.stringify(d);prompt("انسخ هذا والصقه في BobTop في خانة البوست الحقيقي:",j);if(navigator.clipboard) navigator.clipboard.writeText(j);})();' style="display:inline-flex;gap:6px;background:#22c55e;color:#fff;padding:8px 12px;border-radius:8px;font-weight:900;text-decoration:none;border:2px dashed #fff;margin-top:6px">🔖 سجّل البوست الحقيقي</a>
+        <span class="small"> ← اسحبه للمفضلة أيضاً</span>
+        <div class="small" style="margin-top:6px">افتح أي بوست في فيسبوك → دوس هذا الزر → انسخ النص → الصقه تحت → استيراد</div>
+      </div>
+    </div>
     <div class="row">
-      <button id="btnTest" class="btn btn-g">🔔 جرّب تنبيه حقيقي</button>
-      <button id="btnCheck" class="btn btn-p">🔍 افحص البوستات الجديدة الآن</button>
+      <input id="postJson" class="input" placeholder="الصق هنا نص البوست الحقيقي المنسوخ ثم دوس استيراد" style="font-family:monospace;direction:ltr">
+      <button id="btnAddPost" class="btn btn-p">استيراد بوست حقيقي</button>
+    </div>
+    <div class="row">
+      <button id="btnTest" class="btn btn-g">🔔 جرّب تنبيه (تجربة)</button>
+      <button id="btnCheck" class="btn btn-p">🔍 افتح الجروبات المحددة</button>
       <button id="btnClearPosts" class="btn btn-s">مسح التنبيهات</button>
     </div>
-    <div class="small" style="margin-top:6px">الفحص يفتح الجروبات المحددة في تبويبات + يسجل البوستات هنا برابط مباشر. <b>المعيار:</b> كل بوست يظهر هنا = تنبيه حقيقي.</div>
+    <div class="small" style="margin-top:6px">التنبيهات الحقيقية فقط تظهر برابط شغال 100% — التجريبي يفتح صفحة الجروب فقط للاختبار.</div>
     <div id="posts" class="posts"><div class="empty">لا يوجد تنبيهات بعد — دوس "افحص" أو "جرّب تنبيه"</div></div>
     <div id="monStatus" class="small" style="margin-top:8px;color:#9aa0b2"></div>
   </div>
@@ -155,31 +167,31 @@ function sync(){
   $('#chkAll').checked=all; $('#chkAll').indeterminate=!all&&some;
 }
 function renderPosts(){
-  if(!posts.length){$('#posts').innerHTML=`<div class="empty">لا يوجد تنبيهات بعد — دوس "افحص" أو "جرّب تنبيه"</div>`;return;}
+  if(!posts.length){$('#posts').innerHTML=`<div class="empty">لا يوجد تنبيهات بعد — التنبيهات الحقيقية فقط تظهر هنا برابط شغال</div>`;return;}
   $('#posts').innerHTML=posts.map(p=>`
-    <div class="post">
-      <div class="post-head"><b>${esc(p.groupName)}</b><span>${esc(p.time)}</span></div>
+    <div class="post" style="${p.isReal?'':'opacity:.7;border:1px dashed #f59e0b'}">
+      <div class="post-head"><b>${esc(p.groupName)}</b><span>${esc(p.time)} ${p.isReal?'':'• تجربة'}</span></div>
       <div class="post-text">${esc(p.text)}</div>
       <div style="font-size:11px;color:#60a5fa;direction:ltr;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:4px">${esc(p.postUrl)}</div>
       <div class="post-actions">
-        <a href="${p.postUrl}" target="_blank" class="btn btn-p" style="padding:6px 10px;font-size:12px;text-decoration:none">افتح البوست ↗</a>
+        <a href="${p.postUrl}" target="_blank" class="btn btn-p" style="padding:6px 10px;font-size:12px;text-decoration:none">${p.isReal?'افتح البوست ↗':'افتح (تجربة) ↗'}</a>
         <a href="${p.groupUrl}" target="_blank" class="btn btn-s" style="padding:6px 10px;font-size:12px;text-decoration:none">افتح الجروب</a>
-        <span style="font-size:11px;color:#9aa0b2;align-self:center">${p.isReal?'حقيقي':'تجريبي'}</span>
       </div>
+      ${!p.isReal?'<div class="small" style="color:#fbbf24;margin-top:6px">⚠️ تجربة فقط لاختبار التنبيه — الرابط وهمي</div>':''}
     </div>
   `).join('');
 }
-function addPost(group, text, isReal){
+function addPost(group, text, isReal, realUrl){
   const now=new Date();
   const time=now.toLocaleString('ar-EG');
-  const postId=Date.now().toString().slice(-8)+Math.floor(Math.random()*90+10);
-  const postUrl=`${group.url}/permalink/${postId}/`;
+  // حقيقي = رابط حقيقي من البوست، تجريبي = رابط الجروب فقط (شغال)
+  const postUrl = isReal && realUrl ? realUrl : group.url;
   const p={groupName:group.name, groupUrl:group.url, postUrl, text, time, isReal};
   posts.unshift(p);
   if(posts.length>50) posts=posts.slice(0,50);
   savePosts(); renderPosts(); setStatus();
   if(Notification.permission==='granted'){
-    const n=new Notification('منشور جديد في '+group.name,{body:text.slice(0,100)});
+    const n=new Notification((isReal?'منشور حقيقي في ':'تجربة — ')+group.name,{body:text.slice(0,100)});
     n.onclick=()=>window.open(postUrl,'_blank');
   }
   return p;
@@ -253,22 +265,33 @@ $('#btnTest').onclick=async()=>{
   if(Notification.permission!=='granted') await Notification.requestPermission();
   const g=groups.find(x=>sel.has(x.id))||groups[0];
   if(!g) return alert('اختر جروب أولاً');
-  const p=addPost(g,'مطلوب مصمم لوجو بميزانية ممتازة — تواصل خاص', false);
-  $('#monStatus').textContent='تنبيه تجريبي ✓ — '+p.time;
-  if(Notification.permission==='granted'){} else alert('فعّل التنبيهات');
+  // تجربة فقط - يفتح صفحة الجروب (رابط شغال 100%) وليس permalink وهمي
+  const p=addPost(g,'[تجربة] هذا تنبيه اختبار فقط للتأكد أن الإشعارات شغالة', false);
+  $('#monStatus').textContent='تجربة ✓ — تم إرسال تنبيه تجريبي (يفتح الجروب)';
+  if(Notification.permission!=='granted') alert('فعّل التنبيهات في المتصفح');
 };
-const SAMPLE=['مطلوب هوية بصرية لبراند ملابس','مطلوب سوشيال ميديا 12 تصميم','مطلوب لوجو عقارات','مطلوب تعديل صور منتجات','مطلوب بروفايل PDF'];
+$('#btnAddPost').onclick=()=>{
+  const txt=$('#postJson').value.trim();
+  if(!txt) return alert('الصق نص البوست أولاً');
+  try{
+    const o=JSON.parse(txt);
+    if(!o.postUrl) throw 0;
+    // حاول إيجاد الجروب المطابق
+    let g=groups.find(x=>o.groupUrl && o.groupUrl.includes(x.id)) || groups.find(x=>o.postUrl.includes(x.id)) || {name:o.groupName||'جروب', url:o.groupUrl||o.postUrl.split('/permalink')[0].split('/posts')[0]};
+    addPost(g, o.text||'بوست جديد', true, o.postUrl);
+    $('#postJson').value='';
+    $('#monStatus').textContent='تم استيراد بوست حقيقي ✓ — '+o.postUrl.slice(0,50);
+  }catch{ alert('نص غير صالح — انسخ كل النص من المربع'); }
+};
+$('#postJson').addEventListener('paste',()=>setTimeout(()=>{
+  const v=$('#postJson').value.trim();
+  if(v.startsWith('{') && v.includes('postUrl')) $('#btnAddPost').click();
+},400));
 $('#btnCheck').onclick=async()=>{
   const a=groups.filter(g=>sel.has(g.id));
   if(!a.length) return alert('اختر جروب أولاً');
-  if(Notification.permission!=='granted') await Notification.requestPermission();
-  // فتح الجروبات المحددة + تسجيل بوستات حقيقية برابط
   a.slice(0,6).forEach(g=>window.open(g.url,'_blank'));
-  // سجل بوستات حقيقية برابط مباشر
-  const g=a[Math.floor(Math.random()*a.length)];
-  const t=SAMPLE[Math.floor(Math.random()*SAMPLE.length)];
-  addPost(g, t, true);
-  $('#monStatus').textContent='فحص حقيقي: فتح '+Math.min(a.length,6)+' جروب + تنبيه جديد — '+new Date().toLocaleTimeString('ar-EG');
+  $('#monStatus').textContent='تم فتح '+Math.min(a.length,6)+' جروب — لفحص بوست حقيقي افتح أي بوست ودوس زر "سجّل البوست الحقيقي"';
 };
 $('#btnClearPosts').onclick=()=>{
   if(!posts.length) return;
