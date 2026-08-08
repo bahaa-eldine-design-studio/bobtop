@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, Notification, shell, session } = require('electron');
+const { app, BrowserWindow, ipcMain, Notification, shell, session, Tray, Menu, nativeImage } = require('electron');
 const path = require('path');
 const fs = require('fs');
 
@@ -20,9 +20,59 @@ function saveStore(data) {
 
 let store = loadStore();
 let mainWindow;
-let fbWindow = null; // hidden FB window for login/scraping
+let fbWindow = null;
 let monitorInterval = null;
 let isMonitoring = false;
+let tray = null;
+let isQuitting = false;
+
+function getIconPath() {
+  const candidates = [
+    path.join(__dirname, '../assets/icon.png'),
+    path.join(__dirname, '../build/icon.png'),
+    path.join(__dirname, 'renderer/assets/icon.png'),
+  ];
+  for (const p of candidates) if (fs.existsSync(p)) return p;
+  return undefined;
+}
+
+function createTray() {
+  if (tray) return;
+  const iconPath = getIconPath();
+  let trayIcon = iconPath ? nativeImage.createFromPath(iconPath) : nativeImage.createEmpty();
+  if (trayIcon.isEmpty()) {
+    // fallback 16x16
+    trayIcon = nativeImage.createFromDataURL('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABFUlEQVR4AWNgGAXDEQwMDP8ZGBgY/v//HwMDEwM3gYHhPwMDA8M/BgaG////MzAwMPz//x/BgYHhPwYGBgZGRkYGRgYGD4D8EGNgYGBgZGRgYGD4D8EGNgYGBgZGRgYGD4DwEGNgYGBgZGRgYGD4DwEGNgYGBgZGRgYGDoHwEGNgYGBgZGRgYGD4DwEGNgYGBgZGRgYGD4DwEGNgYGBgZGRgYGD4DwEGNgYGBgZGRgYGD4DwEGNgYGBgZGRgYGD4DwEGNgYGBgZGRgYGD4D8EGABBgAEQ7xW4k1o3xAAAAABJRU5ErkJggg==');
+  }
+  tray = new Tray(trayIcon.resize({ width: 16, height: 16 }));
+  tray.setToolTip('BobTop - مراقب جروبات التصميم');
+  updateTrayMenu();
+  tray.on('click', () => {
+    if (mainWindow) {
+      if (mainWindow.isVisible()) mainWindow.focus();
+      else { mainWindow.show(); mainWindow.focus(); }
+    }
+  });
+}
+
+function updateTrayMenu() {
+  if (!tray) return;
+  const template = [
+    { label: isMonitoring ? '● يراقب الآن' : '○ متوقف', enabled: false },
+    { type: 'separator' },
+    { label: 'إظهار الواجهة', click: () => { if (mainWindow) { mainWindow.show(); mainWindow.focus(); } } },
+    { label: isMonitoring ? 'إيقاف المراقبة' : 'ابدأ المراقبة', click: () => {
+        if (isMonitoring) { stopMonitoring(); } else { try{ startMonitoring(); }catch(e){} }
+        updateTrayMenu();
+        if (mainWindow) mainWindow.webContents.send('monitor:status', { isMonitoring });
+      }},
+    { label: 'فحص الآن', enabled: isMonitoring, click: () => pollGroups() },
+    { type: 'separator' },
+    { label: 'خروج', click: () => { isQuitting=true; app.quit(); } }
+  ];
+  const menu = Menu.buildFromTemplate(template);
+  tray.setContextMenu(menu);
+}
 
 function createMainWindow() {
   mainWindow = new BrowserWindow({
@@ -32,25 +82,44 @@ function createMainWindow() {
     minHeight: 600,
     backgroundColor: '#0f1115',
     title: 'BobTop - مراقب جروبات التصميم',
+    icon: getIconPath(),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
       nodeIntegration: false,
     },
-    icon: undefined
+    autoHideMenuBar: true,
   });
 
   mainWindow.loadFile(path.join(__dirname, 'renderer', 'index.html'));
-  // mainWindow.webContents.openDevTools();
+  // Hide to tray instead of close
+  mainWindow.on('close', (e) => {
+    if (!isQuitting) {
+      e.preventDefault();
+      mainWindow.hide();
+      if (isMonitoring) {
+        new Notification({ title: 'BobTop', body: 'البرنامج شغال في الخلفية جنب الساعة - يراقب الجروبات' }).show();
+      }
+    }
+  });
   mainWindow.on('closed', () => { mainWindow = null; });
 }
 
 app.whenReady().then(() => {
   createMainWindow();
-  app.on('activate', () => { if (BrowserWindow.getAllWindows().length === 0) createMainWindow(); });
+  createTray();
+  // single instance
+  if (!app.requestSingleInstanceLock()) app.quit();
+  else {
+    app.on('second-instance', () => {
+      if (mainWindow) { if (mainWindow.isMinimized()) mainWindow.restore(); mainWindow.show(); mainWindow.focus(); }
+    });
+  }
+  app.on('activate', () => { if (BrowserWindow.getAllWindows().length === 0) createMainWindow(); else if (mainWindow) mainWindow.show(); });
 });
 
-app.on('window-all-closed', () => { if (process.platform !== 'darwin') app.quit(); });
+app.on('window-all-closed', () => { if (process.platform !== 'darwin') { /* keep in tray if monitoring */ if (!isMonitoring) app.quit(); }});
+app.on('before-quit', () => { isQuitting = true; });
 
 // ---------- Helpers ----------
 function ensureFbWindow() {
@@ -58,19 +127,18 @@ function ensureFbWindow() {
   fbWindow = new BrowserWindow({
     width: 1200,
     height: 800,
-    show: false, // hidden by default, we show when login needed
+    show: false,
+    icon: getIconPath(),
     webPreferences: {
       partition: 'persist:bobtop-fb',
       contextIsolation: true,
     }
   });
-  // Allow opening external links in default browser
   fbWindow.webContents.setWindowOpenHandler(({ url }) => {
     shell.openExternal(url);
     return { action: 'deny' };
   });
   fbWindow.on('close', (e) => {
-    // Hide instead of destroy when monitoring? For now allow close but keep reference
     if (isMonitoring) {
       e.preventDefault();
       fbWindow.hide();
@@ -99,6 +167,7 @@ ipcMain.handle('app:saveSelectedGroups', (e, selectedIds) => {
 ipcMain.handle('app:toggleMonitoring', (e, shouldStart) => {
   if (shouldStart) startMonitoring();
   else stopMonitoring();
+  updateTrayMenu();
   return { isMonitoring };
 });
 ipcMain.handle('app:getMonitoringStatus', () => ({ isMonitoring, monitoredCount: store.monitoredGroups.length }));
@@ -125,26 +194,18 @@ ipcMain.handle('fb:logout', async () => {
   return { loggedIn: false };
 });
 
-// Fetch groups automatically - uses hidden fbWindow to scrape m.facebook.com/groups/?seemore
 ipcMain.handle('fb:fetchGroups', async () => {
   const login = await checkLoginStatus();
   if (!login.loggedIn) throw new Error('يجب تسجيل الدخول أولاً بالاكونت النضيف');
 
   const win = ensureFbWindow();
-  // Use m.facebook.com for lighter parsing
   const targetUrl = 'https://m.facebook.com/groups/?seemore&soft=bookmarks';
-
-  // If window not loaded, load target
   try {
-    win.show(); // show briefly so user sees progress, then hide if monitoring not active
+    win.show();
     await win.loadURL(targetUrl);
-    // wait for load
     await new Promise(r => setTimeout(r, 4000));
-
-    // Inject scraper: scroll and collect
     const groups = await win.webContents.executeJavaScript(`
       (async () => {
-        // Scroll to trigger lazy load
         for (let i=0; i<6; i++) {
           window.scrollTo(0, document.body.scrollHeight);
           await new Promise(r => setTimeout(r, 1200));
@@ -155,18 +216,13 @@ ipcMain.handle('fb:fetchGroups', async () => {
           try {
             let href = a.getAttribute('href') || '';
             if (!href) continue;
-            // Normalize href
             if (href.startsWith('/')) href = 'https://www.facebook.com' + href.split('?')[0];
             else href = href.split('?')[0];
-            // Filter: must be /groups/<id or name> and not /groups/feed etc
             const m = href.match(/\\/groups\\/([^\\/\\?#]+)/);
             if (!m) continue;
             const id = m[1];
-            // Exclude generic paths
             if (['feed','joins','create','discover','bookmarks'].includes(id)) continue;
-            // Name from text or aria-label
             let name = (a.textContent || '').trim().replace(/\\s+/g,' ');
-            // Try to get better name from parent
             if (!name || name.length < 2 || name.length > 80) {
                 const parent = a.closest('div');
                 if (parent) {
@@ -175,11 +231,9 @@ ipcMain.handle('fb:fetchGroups', async () => {
                 }
             }
             if (!name || name.length < 2) name = id;
-            // Deduplicate by id
             if (!seen.has(id)) {
                 seen.set(id, { id, name: name.substring(0,80), url: 'https://www.facebook.com/groups/' + id });
             } else {
-                // Keep longer name
                 const cur = seen.get(id);
                 if (name.length > cur.name.length && name !== id) cur.name = name.substring(0,80);
             }
@@ -188,11 +242,8 @@ ipcMain.handle('fb:fetchGroups', async () => {
         return Array.from(seen.values());
       })()
     `);
-
-    // Also try alternative parsing via m.facebook.com HTML if few results, fallback to desktop groups page
     let finalGroups = groups;
     if (!finalGroups || finalGroups.length < 3) {
-      // Try desktop groups page as fallback
       await win.loadURL('https://www.facebook.com/groups/joins');
       await new Promise(r => setTimeout(r, 4000));
       for (let i=0;i<4;i++) { await win.webContents.executeJavaScript('window.scrollTo(0, document.body.scrollHeight)'); await new Promise(r=>setTimeout(r,1000)); }
@@ -221,15 +272,10 @@ ipcMain.handle('fb:fetchGroups', async () => {
       `);
       if (fallback && fallback.length > finalGroups.length) finalGroups = fallback;
     }
-
-    // Merge with stored, update store
-    // Keep existing monitored selection
     store.groups = finalGroups;
-    // Preserve selected ids that still exist
     store.selectedGroupIds = store.selectedGroupIds.filter(id => finalGroups.some(g=>g.id===id));
     store.monitoredGroups = finalGroups.filter(g=>store.selectedGroupIds.includes(g.id));
     saveStore(store);
-
     if (!isMonitoring) win.hide();
     return { groups: finalGroups, count: finalGroups.length };
   } catch (e) {
@@ -239,7 +285,6 @@ ipcMain.handle('fb:fetchGroups', async () => {
   }
 });
 
-// Mock notification test
 ipcMain.handle('app:testNotification', async () => {
   const n = new Notification({ title: 'BobTop - اختبار', body: 'منشور جديد في جروب [مصممين جرافيك] - مطلوب مصمم لوجو بميزانية ممتازة', silent: false });
   n.show();
@@ -247,36 +292,24 @@ ipcMain.handle('app:testNotification', async () => {
   return { ok: true };
 });
 
-// Monitoring logic
 async function pollGroups() {
   if (!isMonitoring || store.monitoredGroups.length === 0) return;
   const win = ensureFbWindow();
-  // Ensure logged in
   const login = await checkLoginStatus();
   if (!login.loggedIn) {
     console.log('[monitor] not logged in, skip');
     return;
   }
-
   for (const group of store.monitoredGroups) {
     try {
-      // Use m.facebook.com group page
       const url = `https://m.facebook.com/groups/${group.id}/`;
       await win.loadURL(url);
-      await new Promise(r => setTimeout(r, 2500 + Math.random()*1500)); // human-like delay
-
+      await new Promise(r => setTimeout(r, 2500 + Math.random()*1500));
       const result = await win.webContents.executeJavaScript(`
         (() => {
-          // m.facebook.com posts are in articles or divs with data-ft or story
-          const posts = [];
-          // Try to get first 3 posts links
-          const anchors = Array.from(document.querySelectorAll('a[href*="/groups/"][href*="/permalink/"], a[href*="/story.php"], a[href*="/photo.php"]'));
-          // Fallback: any link with story id
-          const articles = Array.from(document.querySelectorAll('article, div[data-ft]'));
           let postId = null;
           let text = '';
           let author = '';
-          // Try to extract first post text
           const story = document.querySelector('[data-ft]');
           if (story) {
             try {
@@ -285,7 +318,6 @@ async function pollGroups() {
             } catch {}
           }
           if (!postId) {
-            // try to find permalink
             const link = document.querySelector('a[href*="permalink"]');
             if (link) {
               const h = link.getAttribute('href');
@@ -293,7 +325,6 @@ async function pollGroups() {
               if (m) postId = m[1];
             }
           }
-          // Extract text from first article
           const firstArticle = document.querySelector('article') || document.querySelector('div.story_body_container') || document.body;
           if (firstArticle) {
             text = (firstArticle.innerText || '').substring(0, 140).replace(/\\n/g,' ').trim();
@@ -303,36 +334,25 @@ async function pollGroups() {
           return { postId: postId || ('fallback_'+Date.now()+'_'+Math.random().toString(36).slice(2,6)), text: text.substring(0,120), author };
         })()
       `);
-
       if (!result || !result.postId) continue;
-
       const lastSeen = store.lastSeenPosts[group.id];
       if (!lastSeen) {
-        // First time seeing this group, just store without notifying to avoid spam on first run
         store.lastSeenPosts[group.id] = result.postId;
         saveStore(store);
         continue;
       }
       if (result.postId !== lastSeen) {
-        // New post detected!
         store.lastSeenPosts[group.id] = result.postId;
         saveStore(store);
-
         const notifTitle = `منشور جديد في ${group.name}`;
         const notifBody = result.author ? `${result.author}: ${result.text || 'افتح لرؤية التفاصيل'}` : (result.text || 'منشور جديد - اضغط للفتح');
         const notif = new Notification({ title: notifTitle, body: notifBody.substring(0, 180), silent: false });
         notif.show();
-        notif.on('click', () => {
-          shell.openExternal(group.url);
-        });
-
-        // Also send to renderer for activity log
+        notif.on('click', () => shell.openExternal(group.url));
         if (mainWindow && !mainWindow.isDestroyed()) {
           mainWindow.webContents.send('monitor:newPost', { group, post: result, at: new Date().toISOString() });
         }
       }
-
-      // Random delay between groups to be human-like
       await new Promise(r => setTimeout(r, 1200 + Math.random()*1800));
     } catch (e) {
       console.error('poll group', group.id, e.message);
@@ -345,12 +365,10 @@ function startMonitoring() {
   if (isMonitoring) return;
   if (store.monitoredGroups.length === 0) throw new Error('اختر جروب واحد على الأقل');
   isMonitoring = true;
-  // Ensure win exists but hidden
   ensureFbWindow().hide();
-  // Immediate poll then interval with randomization 2.5-4.5 min
   pollGroups();
   const scheduleNext = () => {
-    const delay = 150000 + Math.random()*120000; // 2.5 to 4.5 min
+    const delay = 150000 + Math.random()*120000;
     monitorInterval = setTimeout(async () => {
       await pollGroups();
       if (isMonitoring) scheduleNext();
@@ -358,6 +376,7 @@ function startMonitoring() {
   };
   scheduleNext();
   if (mainWindow) mainWindow.webContents.send('monitor:status', { isMonitoring: true });
+  updateTrayMenu();
 }
 
 function stopMonitoring() {
@@ -365,6 +384,7 @@ function stopMonitoring() {
   if (monitorInterval) clearTimeout(monitorInterval);
   monitorInterval = null;
   if (mainWindow) mainWindow.webContents.send('monitor:status', { isMonitoring: false });
+  updateTrayMenu();
 }
 
 ipcMain.handle('monitor:manualPoll', async () => {

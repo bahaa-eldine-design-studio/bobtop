@@ -1,16 +1,60 @@
 {
   "name": "bobtop",
   "version": "0.1.0",
-  "description": "BobTop - Facebook Groups Monitor - Desktop App + Web Preview",
+  "description": "BobTop - Facebook Groups Monitor - Desktop App",
   "main": "src/main.js",
+  "author": "BobTop",
+  "license": "MIT",
+  "private": true,
+  "build": {
+    "appId": "com.bobtop.desktop",
+    "productName": "BobTop",
+    "copyright": "Copyright © 2026 BobTop",
+    "directories": {
+      "output": "dist",
+      "buildResources": "assets"
+    },
+    "files": [
+      "src/**/*",
+      "assets/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": ["nsis", "portable"],
+      "icon": "assets/icon.png",
+      "artifactName": "BobTop-Setup-${version}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "BobTop"
+    },
+    "linux": {
+      "target": ["AppImage", "deb"],
+      "icon": "assets/icon.png",
+      "category": "Office",
+      "artifactName": "BobTop-${version}.${ext}"
+    },
+    "mac": {
+      "target": ["dmg"],
+      "icon": "assets/icon.png",
+      "category": "public.app-category.business"
+    },
+    "portable": {
+      "artifactName": "BobTop-Portable-${version}.${ext}"
+    }
+  },
   "scripts": {
     "start": "electron .",
     "dev": "electron . --dev",
     "web": "node src/web-preview/server.js",
-    "build": "electron-builder"
+    "build": "electron-builder",
+    "build:win": "electron-builder --win",
+    "build:linux": "electron-builder --linux",
+    "postinstall": "electron-builder install-app-deps"
   },
-  "author": "BobTop",
-  "license": "MIT",
   "devDependencies": {
     "electron": "^30.0.0",
     "electron-builder": "^24.9.0"
